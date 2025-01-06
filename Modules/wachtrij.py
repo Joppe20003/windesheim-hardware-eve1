@@ -1,31 +1,55 @@
 class WachtrijTheorie:
-    def __init__(self, verwerkings_snelheid: float, aantal_personen_in_systeem: float):
-        self._verwerkings_snelheid = verwerkings_snelheid  # μ: Verwerkingssnelheid
-        self._aantal_personen_in_systeem = aantal_personen_in_systeem  # N: Personen in systeem
+    def __init__(self, aankomst_snelheid, verwerkings_snelheid):
+        self._aankomst_snelheid = aankomst_snelheid  # I
+        self._verwerkings_snelheid = verwerkings_snelheid  # M
+        self._aantal_personen_in_systeem = 0
 
-        # Aannames en berekeningen
-        self._aankomst_snelheid = self._aantal_personen_in_systeem * self._verwerkings_snelheid / (self._aantal_personen_in_systeem + 1)  # λ (geschat)
-        self._bezettings_graad = self._aankomst_snelheid / self._verwerkings_snelheid * 100  # g = λ / μ * 100
+    def verander_aantal_personen_in_systeem(self, aantal_personen_in_systeem, bereken = False):
+        self._aantal_personen_in_systeem = aantal_personen_in_systeem
+        
+        if bereken:
+            self.bereken()
 
-        # Wachttijdberekeningen volgens wachtrijtheorie
-        self._totale_tijd = 1 / (self._verwerkings_snelheid - self._aankomst_snelheid)  # T = 1 / (μ - λ)
-        self._service_tijd = 1 / self._verwerkings_snelheid  # S = 1 / μ
-        self._wacht_tijd = self._totale_tijd - self._service_tijd  # W = T - S
+    def verander_aankomst_snelheid(self, aantal, bereken = False):
+        self._aankomst_snelheid = aantal
 
-    def bezettings_graad(self, decimalen: float) -> float:
-        return self.afr(self._bezettings_graad, decimalen)
+        if bereken:
+            self.bereken()
 
-    def totale_tijd(self) -> float:
-        return self._totale_tijd
+    def bereken(self):
+        if self._verwerkings_snelheid == 0:
+            raise ValueError("Verwerkings snelheid mag niet 0 zijn.")
+        
+        self._bezettingsgraad = self._aankomst_snelheid / self._verwerkings_snelheid # G = I / M
+        
+        if self._aankomst_snelheid == 0:
+            self._totale_tijd = 0
+            self._wacht_tijd = 0
+        else:
+            self._totale_tijd = self._aantal_personen_in_systeem / self._aankomst_snelheid # T = N / I
+            self._service_tijd = 1 / self._verwerkings_snelheid # S = 1 / M
+            self._wacht_tijd = self._totale_tijd - self._service_tijd # W = T - S
 
-    def service_tijd(self) -> float:
-        return self._service_tijd
+    def krijg_bezettings_graad(self):
+        return round(self._bezettingsgraad * 100, 2)
 
-    def wacht_tijd(self) -> float:
-        return self._wacht_tijd
+    def krijg_totale_tijd(self):
+        return round(self._totale_tijd, 2)
 
-    def aankomst_snelheid(self) -> float:
-        return self._aankomst_snelheid
+    def krijg_service_tijd(self):
+        return round(self._service_tijd, 2)
     
-    def afr(self, getal: float, decimalen: float) -> float:
-        return round(getal, decimalen)
+    def krijg_actuele_wacht_tijd(self):
+        return round(self._aantal_personen_in_systeem * (1 / self._verwerkings_snelheid), 2)
+
+    def krijg_wacht_tijd(self):
+        return round(self._wacht_tijd, 2)
+
+    def krijg_aantal_personen_in_systeem(self):
+        return round(self._aantal_personen_in_systeem, 2)
+
+    def krijg_aankomst_snelheid(self):
+        return round(self._aankomst_snelheid, 2)
+
+    def krijg_verwerkings_snelheid(self):
+        return round(self._verwerkings_snelheid, 2)
