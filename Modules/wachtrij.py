@@ -24,6 +24,7 @@ class WachtrijTheorie:
         
         if self._aankomst_snelheid == 0:
             self._totale_tijd = 0
+            self._service_tijd = 0
             self._wacht_tijd = 0
         else:
             self._totale_tijd = self._aantal_personen_in_systeem / self._aankomst_snelheid # T = N / I
@@ -40,7 +41,7 @@ class WachtrijTheorie:
         return round(self._service_tijd, 2)
     
     def krijg_actuele_wacht_tijd(self):
-        return round(self._aantal_personen_in_systeem * (1 / self._verwerkings_snelheid), 2)
+        return round(self._aantal_personen_in_systeem * (1 / self._verwerkings_snelheid), 1)
 
     def krijg_wacht_tijd(self):
         return round(self._wacht_tijd, 2)

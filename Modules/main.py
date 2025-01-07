@@ -44,7 +44,7 @@ class Main:
         self.BOARD = Arduino(self._arduino_port)
         self.IT = util.Iterator(self.BOARD)
         
-        self._wachtrijTheorie: WachtrijTheorie = WachtrijTheorie(0, self._verwerkings_snelheid)
+        self._wachtrijTheorie: WachtrijTheorie = WachtrijTheorie(self._aankomst_snelheid, self._verwerkings_snelheid)
         self._huidige_tijd: float = time.time()
         self._interval_tijd: float = time.time()
 
@@ -76,18 +76,20 @@ class Main:
         self._verlaten_knop_waarde = waarde
 
     # Tel het aantal personen in het systeem op
-    def _tel_aantal_personen_in_systeem_op(self, aantal: int = 1):
+    def _tel_aantal_personen_in_systeem_op(self, aantal: int = 1) -> None:
         self._aankomst_snelheid += aantal
         self._aantal_personen_in_systeem += aantal
         self._wachtrijTheorie.verander_aantal_personen_in_systeem(self._aantal_personen_in_systeem)
   
+        print('---------------------------------------------------------------------------------------------')
         print(f"Aantal personen verhoogd!, Totaal : {self._aantal_personen_in_systeem}")
 
     # Tel het aantal personen in het systeem af
-    def _tel_aantal_personen_in_systeem_af(self, aantal: int = 1):
+    def _tel_aantal_personen_in_systeem_af(self, aantal: int = 1) -> None:
         self._aantal_personen_in_systeem -= aantal
         self._wachtrijTheorie.verander_aantal_personen_in_systeem(self._aantal_personen_in_systeem)
   
+        print('---------------------------------------------------------------------------------------------')
         print(f"Aantal personen verlaagd!, Totaal : {self._aantal_personen_in_systeem}")
 
     # Controleert of het interval voor aankomst snelheid is verstreken
@@ -118,7 +120,7 @@ class Main:
             self._led_uit(self.LED_STOPLICHT[i]['led_pin'])
 
     # Krijg het aantal resterende personen
-    def _krijg_resterende_personen(self):
+    def _krijg_resterende_personen(self) -> None:
         if self._capaciteit - self._aantal_personen_in_systeem <= 0:
             return "VOL"
         else:
@@ -154,19 +156,31 @@ class Main:
                 break  # Stop met zoeken zodra het juiste licht aan is
 
     # Update het LCD-display
-    def _update_lcd_display(self):
-        self.lcd.schrijf(1, f'Plekken  : {self._krijg_resterende_personen()}')
-        self.lcd.schrijf(2, f"Wachttijd: {self._wachtrijTheorie.krijg_actuele_wacht_tijd()}M")
+    def _update_lcd_display(self) -> None:
+        self.lcd.schrijf(1, f'Plekken  :{self._krijg_resterende_personen()}')
+        self.lcd.schrijf(2, f"Wachttijd:{self._wachtrijTheorie.krijg_actuele_wacht_tijd()}M")
 
     # Controleer de status van de betreden knop
-    def _check_betreden_knop(self, huidige_waarde, vorige_waarde):
+    def _check_betreden_knop(self, huidige_waarde, vorige_waarde) -> None:
         if huidige_waarde >= self.KNOP_INDRUK_WAARDE and vorige_waarde < self.KNOP_INDRUK_WAARDE and self._aantal_personen_in_systeem < self._capaciteit:
             self._tel_aantal_personen_in_systeem_op()
 
     # Controleer de status van de verlaten knop
-    def _check_verlaten_knop(self, huidige_waarde, vorige_waarde):
+    def _check_verlaten_knop(self, huidige_waarde, vorige_waarde) -> None:
         if huidige_waarde >= self.KNOP_INDRUK_WAARDE and vorige_waarde < self.KNOP_INDRUK_WAARDE and self._aantal_personen_in_systeem > 0:
             self._tel_aantal_personen_in_systeem_af()
+
+    def _print_wachtrij_kentallen(self) -> None:
+        print('---------------------------------------------------------------------------------------------')
+        print('KENTALLEN')
+        print(f'Verwerkings snelheid           : {self._wachtrijTheorie.krijg_verwerkings_snelheid()}')
+        print(f'Aankomst snelheid              : {self._wachtrijTheorie.krijg_aankomst_snelheid()}')
+        print(f'Aantal personen in het systeem : {self._wachtrijTheorie.krijg_aantal_personen_in_systeem()}')
+        print(f'Bezttingsgraad                 : {self._wachtrijTheorie.krijg_bezettings_graad()}%')
+        print(f'Service tijd                   : {self._wachtrijTheorie.krijg_service_tijd()}')
+        print(f'Totale tijd                    : {self._wachtrijTheorie.krijg_totale_tijd()}')
+        print(f'Wacht tijd                     : {self._wachtrijTheorie.krijg_wacht_tijd()}')
+        print(f'Actuele wacht tijd             : {self._wachtrijTheorie.krijg_actuele_wacht_tijd()}')
 
     # Start de hoofd lus
     def start_main_loop(self) -> None:
@@ -189,11 +203,12 @@ class Main:
 
             if self._is_aankomst_snelheid_interval_over():
                 self._pas_aankomst_snelheid_aan(self._aankomst_snelheid)
+                self._print_wachtrij_kentallen()
                 self._reset_aankomst_snelheid_interval_check()
                 
             self._bewerk_stoplicht()
             self._update_lcd_display()
-            
+
             time.sleep(self.TIME_DEBOUNCE)
 
     # Start het programma
