@@ -5,7 +5,7 @@ import time
 
 class Main:
     # Constante variabelen
-    AANKOMST_SNELHEID_INTERVAL: int     = 10
+    AANKOMST_SNELHEID_INTERVAL: int     = None
     TIME_DEBOUNCE: float                = 0.05
     KNOP_INDRUK_WAARDE: float           = 0.5
     BOARD: Arduino                      = None
@@ -15,15 +15,18 @@ class Main:
     LED_GROEN_PIN: int                  = 9
     LED_GEEL_PIN: int                   = 8
     LED_ROOD_PIN: int                   = 7
+    LED_VOL_PIN: int                    = 6
     LED_STATUSSEN: list                 = [
                                             0, 
                                             70, 
-                                            90
+                                            90,
+                                            100
                                         ]
     LED_STOPLICHT: list                 = [
                                             {'led_pin': LED_GROEN_PIN}, 
                                             {'led_pin': LED_GEEL_PIN}, 
-                                            {'led_pin': LED_ROOD_PIN}
+                                            {'led_pin': LED_ROOD_PIN},
+                                            {'led_pin': LED_VOL_PIN}
                                         ]
 
     # Globale variabelen
@@ -34,8 +37,9 @@ class Main:
     _betreden_knop_status: bool         = False
     _vorige_knop_status: bool           = False
     
-    def __init__(self, verwerkings_snelheid: float, capaciteit: int, arduino_port: str):
+    def __init__(self, aankomst_snelheid_interval: int, verwerkings_snelheid: float, capaciteit: int, arduino_port: str):
         # Instellen van de basisvariabelen
+        self.AANKOMST_SNELHEID_INTERVAL = aankomst_snelheid_interval
         self._verwerkings_snelheid = verwerkings_snelheid
         self._capaciteit = capaciteit
         self._arduino_port = arduino_port 
@@ -138,11 +142,6 @@ class Main:
         # Zet eerst alle LEDs uit
         self._alle_leds_uit()
 
-        # Als er geen mensen in het systeem zijn, zet dan het groene licht aan
-        if self._aantal_personen_in_systeem == 0:
-            self._led_aan(self.LED_GROEN_PIN)  # Groen licht
-            return
-
         # Voeg het aantal personen in het systeem toe aan de randvoorwaarden
         rand_voorwaarden.append(self._aantal_personen_in_systeem)
         rand_voorwaarden.sort()
@@ -179,8 +178,8 @@ class Main:
         print(f'Bezttingsgraad                 : {self._wachtrijTheorie.krijg_bezettings_graad()}%')
         print(f'Service tijd                   : {self._wachtrijTheorie.krijg_service_tijd()}')
         print(f'Totale tijd                    : {self._wachtrijTheorie.krijg_totale_tijd()}')
-        print(f'Wacht tijd                     : {self._wachtrijTheorie.krijg_wacht_tijd()}')
-        print(f'Actuele wacht tijd             : {self._wachtrijTheorie.krijg_actuele_wacht_tijd()}')
+        print(f'Wachttijd                      : {self._wachtrijTheorie.krijg_wacht_tijd()}')
+        print(f'Actuele wachttijd              : {self._wachtrijTheorie.krijg_actuele_wacht_tijd()}')
 
     # Start de hoofd lus
     def start_main_loop(self) -> None:
