@@ -5,7 +5,7 @@ import time
 
 class Main:
     # Constante variabelen
-    AANKOMST_SNELHEID_INTERVAL: int     = None
+    AANKOMST_SNELHEID_INTERVAL: int     = 10
     TIME_DEBOUNCE: float                = 0.05
     KNOP_INDRUK_WAARDE: float           = 0.5
     BOARD: Arduino                      = None
@@ -37,9 +37,8 @@ class Main:
     _betreden_knop_status: bool         = False
     _vorige_knop_status: bool           = False
     
-    def __init__(self, aankomst_snelheid_interval: int, verwerkings_snelheid: float, capaciteit: int, arduino_port: str):
+    def __init__(self, verwerkings_snelheid: float, capaciteit: int, arduino_port: str):
         # Instellen van de basisvariabelen
-        self.AANKOMST_SNELHEID_INTERVAL = aankomst_snelheid_interval
         self._verwerkings_snelheid = verwerkings_snelheid
         self._capaciteit = capaciteit
         self._arduino_port = arduino_port 
