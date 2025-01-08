@@ -89,6 +89,9 @@ class Main:
 
     # Tel het aantal personen in het systeem af
     def _tel_aantal_personen_in_systeem_af(self, aantal: int = 1) -> None:
+        if self._aankomst_snelheid > 0:
+            self._aankomst_snelheid -= aantal
+
         self._aantal_personen_in_systeem -= aantal
         self._wachtrijTheorie.verander_aantal_personen_in_systeem(self._aantal_personen_in_systeem)
   
@@ -174,6 +177,7 @@ class Main:
         print(f'Verwerkings snelheid           : {self._wachtrijTheorie.krijg_verwerkings_snelheid()}')
         print(f'Aankomst snelheid              : {self._wachtrijTheorie.krijg_aankomst_snelheid()}')
         print(f'Aantal personen in het systeem : {self._wachtrijTheorie.krijg_aantal_personen_in_systeem()}')
+        print(f'Aantal plekken over            : {self._krijg_resterende_personen()}')
         print(f'Bezttingsgraad                 : {self._wachtrijTheorie.krijg_bezettings_graad()}%')
         print(f'Service tijd                   : {self._wachtrijTheorie.krijg_service_tijd()}')
         print(f'Totale tijd                    : {self._wachtrijTheorie.krijg_totale_tijd()}')
